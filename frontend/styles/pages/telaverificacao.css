@@ -1,29 +1,29 @@
 @import url(/frontend/styles/global.css);
 
 #campo-verificacao {
-    display: flex;
-    justify-content: center;
-    gap: 10px;
-    margin: 20px 0;
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+  margin: 20px 0;
 }
 
 #campo-verificacao input {
-    width: 45px;
-    height: 50px;
-    box-sizing: border-box;
-    text-align: center;
-    font-size: 1.2rem;
-    font-weight: bold;
-    border: 2px solid #ccc;
-    border-radius: 8px;
-    outline: none;
+  width: 45px;
+  height: 50px;
+  box-sizing: border-box;
+  text-align: center;
+  font-size: 1.2rem;
+  font-weight: bold;
+  border: 2px solid #ccc;
+  border-radius: 8px;
+  outline: none;
 }
 
 #campo-verificacao input:focus {
-    border-color: #007bff;
+  border-color: #007bff;
 }
 
 #verificar {
-    padding: 10px 20px;
-    cursor: pointer;
+  padding: 10px 20px;
+  cursor: pointer;
 }
