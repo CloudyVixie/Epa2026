@@ -43,7 +43,7 @@ try {
         responderLogin(['erro' => 'E-mail ou senha incorretos.'], 401);
     }
 
-    if (!(bool) $usuario['verificado']) {
+    if (!in_array($usuario['verificado'], [true, 1, '1', 't', 'true'], true)) {
         responderLogin(['erro' => 'Confirme seu e-mail antes de entrar.'], 403);
     }
 
