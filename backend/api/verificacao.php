@@ -85,6 +85,11 @@ try {
             responder(['erro' => 'Este e-mail está temporariamente bloqueado.'], 429);
         }
 
+        $codigoAnterior = $verificacao->verificarSituacao($email);
+        if ($codigoAnterior && (int) $codigoAnterior['decorrido'] < 60) {
+            responder(['erro' => 'Aguarde um minuto antes de solicitar outro código.'], 429);
+        }
+
         $pdo = getConexao();
         $stmt = $pdo->prepare('SELECT id FROM personagem WHERE id = ?');
         $stmt->execute([$personagemId]);
