@@ -1,13 +1,31 @@
-document.getElementById("login").onclick = function logar() {
-  let email = document.getElementById("email").value;
-  let senha = document.getElementById("senha").value;
+const botaoLogin = document.getElementById("login");
+const campoEmail = document.getElementById("email");
+const campoSenha = document.getElementById("senha");
 
-  let validarEmail = /^[^@\s]+@[^@\s]+\.com$/;
+botaoLogin.addEventListener("click", async () => {
+  const email = campoEmail.value.trim();
+  const senha = campoSenha.value;
 
-  if (!validarEmail.test(email)) {
-    alert("Email inválido! precisa ser email@email.com!");
+  if (!campoEmail.validity.valid || !email || !senha) {
+    alert("Informe um e-mail válido e a senha.");
     return;
   }
 
-  console.log(email, senha);
-};
+  botaoLogin.disabled = true;
+  try {
+    const resposta = await fetch("./backend/api/login.php", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ email, senha }),
+    });
+    const dados = await resposta.json();
+    if (!resposta.ok || !dados.sucesso) {
+      throw new Error(dados.erro || "Não foi possível entrar.");
+    }
+    alert(dados.mensagem);
+  } catch (erro) {
+    alert(erro.message || "Erro ao realizar login.");
+  } finally {
+    botaoLogin.disabled = false;
+  }
+});
