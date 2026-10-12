@@ -1,0 +1,28 @@
+name: Verificações estáticas
+
+on:
+  pull_request:
+  push:
+    branches:
+      - main
+      - fix/registro-verificacao-login
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Configurar PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.2'
+      - name: Verificar sintaxe PHP
+        run: find . -type f -name '*.php' -not -path './vendor/*' -print0 | xargs -0 -n1 php -l
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      - name: Verificar sintaxe JavaScript
+        run: |
+          node --check backend/scripts/cadastrar.js
+          node --check backend/scripts/verificar.js
+          node --check backend/scripts/login.js
