@@ -71,7 +71,7 @@ try {
         $senha = (string) ($dados['senha'] ?? '');
         $personagemId = filter_var($dados['personagem_id'] ?? null, FILTER_VALIDATE_INT);
 
-        if ($nome === '' || mb_strlen($nome) > 100) {
+        if ($nome === '' || strlen($nome) > 300) {
             responder(['erro' => 'Informe um nome com até 100 caracteres.'], 400);
         }
         if (strlen($senha) < 9 || strlen($senha) > 72) {
@@ -98,7 +98,7 @@ try {
                 $nome,
                 password_hash($senha, PASSWORD_DEFAULT),
                 $email,
-                hash('sha256', $codigo),
+                password_hash($codigo, PASSWORD_DEFAULT),
                 (int) $personagemId
             );
         } catch (DomainException $erro) {
@@ -141,7 +141,7 @@ try {
             responder(['erro' => 'Limite de tentativas atingido. Aguarde uma hora.'], 429);
         }
 
-        if (!hash_equals((string) $registro['codigo'], hash('sha256', $codigo))) {
+        if (!password_verify($codigo, (string) $registro['codigo'])) {
             $verificacao->incrementarTentativa($email);
             $tentativas = (int) $registro['tentativas'] + 1;
             if ($tentativas >= 5) {
