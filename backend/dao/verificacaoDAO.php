@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 require_once __DIR__ . '/../config/conexao.php';
 
 class Verificacao
@@ -13,25 +15,43 @@ class Verificacao
 
     public function salvarUsuarioNaoVerificado(
         string $nome,
-        string $senha,
+        string $senhaHash,
         string $email,
-        string $codigo
+        string $codigoHash
     ): void {
         $this->pdo->beginTransaction();
 
         try {
-            $sql = "INSERT INTO usuario (nome, senha, email, verificado)
-                    VALUES (?, ?, ?, FALSE)";
+            $consulta = $this->pdo->prepare(
+                'SELECT verificado FROM usuario WHERE email = ? FOR UPDATE'
+            );
+            $consulta->execute([$email]);
+            $usuario = $consulta->fetch();
 
-            $stmt = $this->pdo->prepare($sql);
-            $stmt->execute([$nome, $senha, $email]);
+            if ($usuario && $usuario['verificado']) {
+                throw new DomainException('Este e-mail já possui uma conta verificada.');
+            }
 
-            $sql = "INSERT INTO verificacao
+            if ($usuario) {
+                $atualizar = $this->pdo->prepare(
+                    'UPDATE usuario SET nome = ?, senha = ? WHERE email = ?'
+                );
+                $atualizar->execute([$nome, $senhaHash, $email]);
+                $this->apagarPorEmail($email);
+            } else {
+                $inserir = $this->pdo->prepare(
+                    'INSERT INTO usuario (nome, senha, email, verificado)
+                     VALUES (?, ?, ?, FALSE)'
+                );
+                $inserir->execute([$nome, $senhaHash, $email]);
+            }
+
+            $inserirCodigo = $this->pdo->prepare(
+                'INSERT INTO verificacao
                     (email_usuario, codigo, tentativas, tempo_aquisicao)
-                    VALUES (?, ?, 0, NOW())";
-
-            $stmt = $this->pdo->prepare($sql);
-            $stmt->execute([$email, $codigo]);
+                 VALUES (?, ?, 0, NOW())'
+            );
+            $inserirCodigo->execute([$email, $codigoHash]);
 
             $this->pdo->commit();
         } catch (Throwable $erro) {
@@ -45,11 +65,9 @@ class Verificacao
 
     public function verificarUsuarioNaoSalvo(string $email): array|false
     {
-        $sql = "SELECT *
-                FROM usuario
-                WHERE email = ? AND verificado = FALSE";
-
-        $stmt = $this->pdo->prepare($sql);
+        $stmt = $this->pdo->prepare(
+            'SELECT * FROM usuario WHERE email = ? AND verificado = FALSE'
+        );
         $stmt->execute([$email]);
 
         return $stmt->fetch();
@@ -60,17 +78,15 @@ class Verificacao
         $this->pdo->beginTransaction();
 
         try {
-            $sql = "UPDATE usuario
-                    SET verificado = TRUE
-                    WHERE email = ? AND verificado = FALSE";
-
-            $stmt = $this->pdo->prepare($sql);
+            $stmt = $this->pdo->prepare(
+                'UPDATE usuario
+                 SET verificado = TRUE
+                 WHERE email = ? AND verificado = FALSE'
+            );
             $stmt->execute([$email]);
 
             if ($stmt->rowCount() !== 1) {
-                throw new RuntimeException(
-                    'Não foi possível confirmar o usuário.'
-                );
+                throw new RuntimeException('Não foi possível confirmar o usuário.');
             }
 
             $this->apagarPorEmail($email);
@@ -86,33 +102,32 @@ class Verificacao
 
     public function apagarPorEmail(string $email): void
     {
-        $sql = "DELETE FROM verificacao WHERE email_usuario = ?";
-        $stmt = $this->pdo->prepare($sql);
+        $stmt = $this->pdo->prepare(
+            'DELETE FROM verificacao WHERE email_usuario = ?'
+        );
         $stmt->execute([$email]);
     }
 
     public function incrementarTentativa(string $email): void
     {
-        $sql = "UPDATE verificacao
-                SET tentativas = tentativas + 1
-                WHERE email_usuario = ?";
-
-        $stmt = $this->pdo->prepare($sql);
+        $stmt = $this->pdo->prepare(
+            'UPDATE verificacao
+             SET tentativas = tentativas + 1
+             WHERE email_usuario = ?'
+        );
         $stmt->execute([$email]);
     }
 
     public function verificarSituacao(string $email): array|false
     {
-        $sql = "SELECT *,
-                       EXTRACT(
-                           EPOCH FROM (NOW() - tempo_aquisicao)
-                       )::INTEGER AS decorrido
-                FROM verificacao
-                WHERE email_usuario = ?
-                ORDER BY tempo_aquisicao DESC
-                LIMIT 1";
-
-        $stmt = $this->pdo->prepare($sql);
+        $stmt = $this->pdo->prepare(
+            'SELECT *,
+                    EXTRACT(EPOCH FROM (NOW() - tempo_aquisicao))::INTEGER AS decorrido
+             FROM verificacao
+             WHERE email_usuario = ?
+             ORDER BY tempo_aquisicao DESC
+             LIMIT 1'
+        );
         $stmt->execute([$email]);
 
         return $stmt->fetch();
@@ -120,10 +135,8 @@ class Verificacao
 
     public function listarUsuarios(): array
     {
-        $sql = "SELECT *
-                FROM usuario
-                WHERE verificado = FALSE";
-
-        return $this->pdo->query($sql)->fetchAll();
+        return $this->pdo
+            ->query('SELECT * FROM usuario WHERE verificado = FALSE')
+            ->fetchAll();
     }
 }
