@@ -28,7 +28,7 @@ class Verificacao
             $consulta->execute([$email]);
             $existente = $consulta->fetch();
 
-            if ($existente && $existente['verificado']) {
+            if ($existente && in_array($existente['verificado'], [true, 1, '1', 't', 'true'], true)) {
                 throw new DomainException('Este e-mail já possui uma conta.');
             }
 
