@@ -39,8 +39,22 @@ try {
     $stmt->execute([$email]);
     $usuario = $stmt->fetch();
 
-    if (!$usuario || !password_verify($senha, (string) $usuario['senha'])) {
+    if (!$usuario) {
         responderLogin(['erro' => 'E-mail ou senha incorretos.'], 401);
+    }
+
+    $senhaValida = password_verify($senha, (string) $usuario['senha']);
+    $senhaLegada = !$senhaValida
+        && preg_match('/^[a-f0-9]{64}$/i', (string) $usuario['senha'])
+        && hash_equals((string) $usuario['senha'], hash('sha256', $senha));
+
+    if (!$senhaValida && !$senhaLegada) {
+        responderLogin(['erro' => 'E-mail ou senha incorretos.'], 401);
+    }
+
+    if ($senhaLegada) {
+        $stmt = $pdo->prepare('UPDATE usuario SET senha = ? WHERE id = ?');
+        $stmt->execute([password_hash($senha, PASSWORD_DEFAULT), $usuario['id']]);
     }
 
     if (!in_array($usuario['verificado'], [true, 1, '1', 't', 'true'], true)) {
