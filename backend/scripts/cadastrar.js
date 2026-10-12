@@ -3,8 +3,34 @@ const formulario = {
   email: document.getElementById("email"),
   senha: document.getElementById("senha"),
   confirmarSenha: document.getElementById("confirmar_senha"),
+  personagens: document.getElementById("personagens"),
   botao: document.getElementById("cadastrar"),
 };
+
+async function carregarPersonagens() {
+  try {
+    const resposta = await fetch("./backend/api/personagens.php");
+    const personagens = await resposta.json();
+
+    if (!resposta.ok || !Array.isArray(personagens)) {
+      throw new Error("Resposta inválida ao carregar personagens.");
+    }
+
+    formulario.personagens.replaceChildren(
+      new Option("Selecione um personagem", ""),
+      ...personagens.map((personagem) =>
+        new Option(personagem.nome_personagem, personagem.id),
+      ),
+    );
+  } catch (erro) {
+    console.error("Erro ao carregar personagens:", erro);
+    formulario.personagens.replaceChildren(
+      new Option("Não foi possível carregar os personagens", ""),
+    );
+  }
+}
+
+carregarPersonagens();
 
 formulario.botao.addEventListener("click", async () => {
   const nome = formulario.nome.value.trim();
