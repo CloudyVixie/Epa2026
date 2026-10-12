@@ -1,1 +1,45 @@
-@import url(../global.css);
+
+@import url("../global.css");
+
+main::before {
+    content: "Bem-vinda de volta";
+    display: block;
+    margin-bottom: 8px;
+
+    color: var(--cor-texto);
+    font-size: 30px;
+    font-weight: 700;
+    letter-spacing: -1px;
+}
+
+main::after {
+    content: "Entre com seu email e sua senha.";
+    display: block;
+    margin-top: 20px;
+
+    color: var(--cor-texto-secundario);
+    font-size: 13px;
+    text-align: center;
+}
+
+#campo-email,
+#campo-senha {
+    margin-bottom: 22px;
+}
+
+#campo-email label,
+#campo-senha label {
+    display: flex;
+    flex-direction: column;
+    gap: 9px;
+}
+
+#login {
+    margin-top: 4px;
+}
+
+@media (max-width: 480px) {
+    main::before {
+        font-size: 27px;
+    }
+}

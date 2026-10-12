@@ -1,3 +1,196 @@
-@import url(./fonts.css);
-@import url(./normalize.css);
-@import url(./variables.css);
+
+:root {
+    color-scheme: dark;
+
+    --cor-fundo: #0b0b0f;
+    --cor-cartao: #15151b;
+    --cor-cartao-hover: #1c1c24;
+    --cor-borda: #303039;
+    --cor-texto: #f5f5f7;
+    --cor-texto-secundario: #a1a1aa;
+    --cor-destaque: #0a84ff;
+    --cor-destaque-hover: #409cff;
+    --cor-erro: #ff453a;
+
+    --raio-cartao: 22px;
+    --raio-campo: 12px;
+}
+
+* {
+    box-sizing: border-box;
+}
+
+html {
+    min-height: 100%;
+    font-size: 16px;
+    -webkit-text-size-adjust: 100%;
+}
+
+body {
+    min-height: 100vh;
+    margin: 0;
+    padding: 32px 20px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    background:
+        radial-gradient(
+            ellipse at 50% 0%,
+            rgba(10, 132, 255, 0.10),
+            transparent 55%
+        ),
+        var(--cor-fundo);
+
+    color: var(--cor-texto);
+    font-family: "SF Pro Display", -apple-system, BlinkMacSystemFont,
+        "Segoe UI", sans-serif;
+
+    font-size: 16px;
+    line-height: 1.5;
+    -webkit-font-smoothing: antialiased;
+}
+
+main {
+    width: 100%;
+    max-width: 440px;
+    padding: 36px;
+
+    background: var(--cor-cartao);
+    border: 1px solid var(--cor-borda);
+    border-radius: var(--raio-cartao);
+
+    box-shadow: 0 24px 80px rgba(0, 0, 0, 0.30);
+}
+
+.cadastro {
+    max-width: 480px;
+}
+
+.campo {
+    display: flex;
+    flex-direction: column;
+    gap: 9px;
+    margin-bottom: 22px;
+}
+
+.campo label {
+    color: var(--cor-texto);
+    font-size: 14px;
+    font-weight: 600;
+}
+
+input,
+select {
+    width: 100%;
+    min-height: 48px;
+    padding: 12px 14px;
+
+    border: 1px solid var(--cor-borda);
+    border-radius: var(--raio-campo);
+
+    background: #101015;
+    color: var(--cor-texto);
+
+    font: inherit;
+    font-size: 15px;
+
+    outline: none;
+    transition:
+        border-color 180ms ease,
+        box-shadow 180ms ease,
+        background 180ms ease;
+}
+
+input::placeholder {
+    color: #777781;
+}
+
+input:hover,
+select:hover {
+    border-color: #484852;
+}
+
+input:focus,
+select:focus {
+    border-color: var(--cor-destaque);
+    box-shadow: 0 0 0 3px rgba(10, 132, 255, 0.18);
+}
+
+input:focus-visible,
+select:focus-visible,
+button:focus-visible {
+    outline: 2px solid var(--cor-destaque);
+    outline-offset: 3px;
+}
+
+button {
+    width: 100%;
+    min-height: 48px;
+    padding: 13px 18px;
+
+    border: 0;
+    border-radius: var(--raio-campo);
+
+    background: var(--cor-destaque);
+    color: #ffffff;
+
+    font: inherit;
+    font-size: 15px;
+    font-weight: 600;
+
+    cursor: pointer;
+    transition:
+        background 180ms ease,
+        transform 180ms ease,
+        box-shadow 180ms ease;
+}
+
+button:hover {
+    background: var(--cor-destaque-hover);
+    box-shadow: 0 5px 20px rgba(10, 132, 255, 0.18);
+}
+
+button:active {
+    transform: scale(0.98);
+}
+
+button:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    box-shadow: none;
+}
+
+input:disabled,
+select:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+::selection {
+    background: rgba(10, 132, 255, 0.35);
+    color: #ffffff;
+}
+
+@media (max-width: 480px) {
+    body {
+        padding: 20px 14px;
+    }
+
+    main,
+    .cadastro {
+        padding: 26px 20px;
+        border-radius: 18px;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+        scroll-behavior: auto !important;
+        animation-duration: 0.01ms !important;
+        transition-duration: 0.01ms !important;
+    }
+}

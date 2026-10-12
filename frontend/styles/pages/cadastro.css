@@ -1,1 +1,56 @@
-@import url(../global.css);
+
+@import url("../global.css");
+
+.cadastro {
+    width: 100%;
+    max-width: 480px;
+}
+
+.cadastro::before {
+    content: "Criar conta";
+    display: block;
+    margin-bottom: 8px;
+
+    color: var(--cor-texto);
+    font-size: 30px;
+    font-weight: 700;
+    letter-spacing: -1px;
+}
+
+.cadastro::after {
+    content: "Preencha os dados para continuar.";
+    display: block;
+    margin-top: 20px;
+
+    color: var(--cor-texto-secundario);
+    font-size: 13px;
+    text-align: center;
+}
+
+#campo-cadastro,
+#campo-email,
+#campo-senha,
+#campo-confirmar-senha,
+#campo-selecionar-personagem {
+    margin-bottom: 20px;
+}
+
+#campo-selecionar-personagem label {
+    display: flex;
+    flex-direction: column;
+    gap: 9px;
+}
+
+#personagens {
+    cursor: pointer;
+}
+
+#cadastrar {
+    margin-top: 4px;
+}
+
+@media (max-width: 480px) {
+    .cadastro::before {
+        font-size: 27px;
+    }
+}

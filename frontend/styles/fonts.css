@@ -1,6 +1,44 @@
 @font-face {
-  font-family: "Fontes";
-  src: url("../fonts/SFPro/SF-Pro-Display-Black.otf") format("truetype");
-  font-weight: normal;
-  font-style: normal;
+    font-family: "SF Pro Display";
+    src: url("../fonts/SFPro/SF-Pro-Display-Regular.otf")
+        format("opentype");
+    font-weight: 400;
+    font-style: normal;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: "SF Pro Display";
+    src: url("../fonts/SFPro/SF-Pro-Display-Medium.otf")
+        format("opentype");
+    font-weight: 500;
+    font-style: normal;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: "SF Pro Display";
+    src: url("../fonts/SFPro/SF-Pro-Display-Semibold.otf")
+        format("opentype");
+    font-weight: 600;
+    font-style: normal;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: "SF Pro Display";
+    src: url("../fonts/SFPro/SF-Pro-Display-Bold.otf")
+        format("opentype");
+    font-weight: 700;
+    font-style: normal;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: "SF Pro Display";
+    src: url("../fonts/SFPro/SF-Pro-Display-Black.otf")
+        format("opentype");
+    font-weight: 900;
+    font-style: normal;
+    font-display: swap;
 }
