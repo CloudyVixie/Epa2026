@@ -1,65 +1,84 @@
-fetch("backend/api/personagens.php")
-  .then((resposta) => resposta.json())
-  .then((personagens) => {
-    const select = document.getElementById("personagens");
-    personagens.forEach((personagem) => {
-      const option = document.createElement("option");
-      option.value = personagem.id;
-      option.textContent = personagem.nome_personagem;
-      select.appendChild(option);
+const selectPersonagens = document.getElementById("personagens");
+const botaoCadastrar = document.getElementById("cadastrar");
+
+async function carregarPersonagens() {
+  try {
+    const resposta = await fetch("./backend/api/personagens.php");
+    const dados = await resposta.json();
+
+    if (!resposta.ok || !Array.isArray(dados)) {
+      throw new Error(dados.erro || "Não foi possível carregar os personagens.");
+    }
+
+    selectPersonagens.replaceChildren(new Option("Selecione um personagem", ""));
+    dados.forEach((personagem) => {
+      selectPersonagens.add(new Option(personagem.nome_personagem, personagem.id));
     });
-  });
+  } catch (erro) {
+    console.error(erro);
+    selectPersonagens.replaceChildren(new Option("Erro ao carregar personagens", ""));
+    alert("Não foi possível carregar os personagens. Confira o PHP e o PostgreSQL.");
+  }
+}
 
-document.getElementById("cadastrar").onclick = function cadastrar() {
-  let nome = document.getElementById("nome").value.trim();
-  let email = document.getElementById("email").value.trim();
-  let senha = document.getElementById("senha").value;
-  let confirmarsenha = document.getElementById("confirmar_senha").value;
+botaoCadastrar.addEventListener("click", async (evento) => {
+  evento.preventDefault();
 
-  let validarEmail = /^[^@\s]+@[^@\s]+\.com$/;
+  const nome = document.getElementById("nome").value.trim();
+  const email = document.getElementById("email").value.trim();
+  const senha = document.getElementById("senha").value;
+  const confirmarSenha = document.getElementById("confirmar_senha").value;
+  const personagemId = selectPersonagens.value;
 
-  if (nome === "" || email === "" || senha === "" || confirmarsenha === "") {
-    alert("Preencha todos os campos!");
+  if (!nome || !email || !senha || !confirmarSenha || !personagemId) {
+    alert("Preencha todos os campos e selecione um personagem.");
     return;
   }
 
-  if (!validarEmail.test(email)) {
-    alert("Digite um e-mail válido terminado em .com!");
+  if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)) {
+    alert("Digite um endereço de e-mail válido.");
     return;
   }
 
-  if (senha.length < 6) {
-    alert("A senha precisa ter pelo menos 6 caracteres!");
+  if (senha.length < 9 || senha.length > 72) {
+    alert("A senha precisa ter entre 9 e 72 caracteres.");
     return;
   }
 
-  if (senha !== confirmarsenha) {
-    alert("As senhas são diferentes!");
+  if (senha !== confirmarSenha) {
+    alert("As senhas são diferentes.");
     return;
   }
 
-  fetch("./api/cadastrar.php", {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify({
-      nome: nome,
-      email: email,
-      senha: senha,
-    }),
-  })
-    .then((resposta) => {
-      if (!resposta.ok) {
-        throw new Error("Erro ao cadastrar usuário!");
-      }
-      return resposta.json();
-    })
-    .then((dados) => {
-      alert(dados.mensagem || "Cadastro realizado!");
-    })
-    .catch((erro) => {
-      console.error(erro);
-      alert("Erro ao realizar cadastro!");
+  botaoCadastrar.disabled = true;
+  const textoOriginal = botaoCadastrar.textContent;
+  botaoCadastrar.textContent = "Enviando...";
+
+  try {
+    const resposta = await fetch("./backend/api/verificacao.php", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        acao: "solicitar",
+        nome,
+        email,
+        senha,
+        personagem_id: Number(personagemId),
+      }),
     });
-};
+
+    const dados = await resposta.json();
+    if (!resposta.ok || !dados.sucesso) {
+      throw new Error(dados.erro || "Não foi possível iniciar o cadastro.");
+    }
+
+    window.location.href = "./telaverificacao.html?email=" + encodeURIComponent(email);
+  } catch (erro) {
+    alert(erro.message || "Erro ao realizar cadastro.");
+  } finally {
+    botaoCadastrar.disabled = false;
+    botaoCadastrar.textContent = textoOriginal;
+  }
+});
+
+carregarPersonagens();
