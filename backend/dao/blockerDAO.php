@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 require_once __DIR__ . '/../config/conexao.php';
 
@@ -13,64 +14,36 @@ class Blocker
 
     public function bloquear(string $email, bool $permanente = false): void
     {
-        $this->pdo->beginTransaction();
+        $stmt = $this->pdo->prepare('DELETE FROM blocker WHERE LOWER(email_usuario) = LOWER(?)');
+        $stmt->execute([$email]);
 
-        try {
-            // Remove registros anteriores para evitar bloqueios duplicados.
-            $stmt = $this->pdo->prepare(
-                "DELETE FROM blocker WHERE email_usuario = ?"
-            );
-            $stmt->execute([$email]);
-
-            $sql = "INSERT INTO blocker
-                    (email_usuario, tempo_bloqueado, permanente)
-                    VALUES (?, NOW(), ?)";
-
-            $stmt = $this->pdo->prepare($sql);
-            $stmt->execute([$email, $permanente]);
-
-            $this->pdo->commit();
-        } catch (Throwable $erro) {
-            if ($this->pdo->inTransaction()) {
-                $this->pdo->rollBack();
-            }
-
-            throw $erro;
-        }
+        $stmt = $this->pdo->prepare(
+            'INSERT INTO blocker (email_usuario, tempo_bloqueado, permanente)
+             VALUES (?, NOW(), ?)'
+        );
+        $stmt->execute([$email, $permanente]);
     }
 
     public function buscarPorEmail(string $email): array|false
     {
-        $sql = "SELECT *
-                FROM blocker
-                WHERE email_usuario = ?
-                ORDER BY tempo_bloqueado DESC
-                LIMIT 1";
-
-        $stmt = $this->pdo->prepare($sql);
+        $stmt = $this->pdo->prepare(
+            'SELECT * FROM blocker WHERE LOWER(email_usuario) = LOWER(?)
+             ORDER BY tempo_bloqueado DESC LIMIT 1'
+        );
         $stmt->execute([$email]);
-
         return $stmt->fetch();
     }
 
     public function estaBloqueado(string $email): array|false
     {
-        $sql = "SELECT *,
-                       EXTRACT(
-                           EPOCH FROM (NOW() - tempo_bloqueado)
-                       )::INTEGER AS decorrido
-                FROM blocker
-                WHERE email_usuario = ?
-                  AND (
-                      permanente = TRUE
-                      OR tempo_bloqueado > NOW() - INTERVAL '1 hour'
-                  )
-                ORDER BY tempo_bloqueado DESC
-                LIMIT 1";
-
-        $stmt = $this->pdo->prepare($sql);
+        $stmt = $this->pdo->prepare(
+            'SELECT *, EXTRACT(EPOCH FROM (NOW() - tempo_bloqueado))::INTEGER AS decorrido
+             FROM blocker
+             WHERE LOWER(email_usuario) = LOWER(?)
+               AND (permanente = TRUE OR tempo_bloqueado > NOW() - INTERVAL \'1 hour\')
+             ORDER BY tempo_bloqueado DESC LIMIT 1'
+        );
         $stmt->execute([$email]);
-
         return $stmt->fetch();
     }
 }
