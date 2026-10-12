@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="./frontend/styles/pages/cadastro.css">
+    <title>Login</title>
+</head>
+<body>
+    
+    <main>
+        <!-- campo email -->
+        <div class="campo" id="campo-email">
+            <label for="email">
+                Insira o email
+                <input type="email" id="email" pattern="[^@\s]+@[^@\s]+\.com" placeholder="email@email.com" required>
+            </label>
+        </div>
+
+        <!-- campo senha -->
+        <div class="campo" id="campo-senha">
+            <label for="senha">
+                Insira a senha
+                <input type="password" id="senha" placeholder="senha">
+            </label>
+        </div>
+
+
+        <button id="login">Login</button>
+    </main>
+
+
+
+    <script src="./backend/scripts/login.js">
+
+    </script>
+</body>
+</html>
