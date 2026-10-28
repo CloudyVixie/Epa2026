@@ -15,9 +15,10 @@ Aplicação web desenvolvida como projeto de estudo, com cadastro de usuários, 
 
 - `backend/config/`: conexão com o banco e configuração de e-mail.
 - `backend/dao/`: acesso e operações sobre os dados.
-- `backend/migrations/`: arquivos de migração do banco.
-- `backend/scripts/`: scripts auxiliares do sistema.
+- `backend/migrations/`: alterações na estrutura do banco.
+- `backend/scripts/`: scripts auxiliares.
 - `frontend/`: arquivos da interface.
+- `cadastrar.html`, `login.html` e `telaverificacao.html`: páginas do fluxo de conta.
 - `.env.example`: modelo das variáveis de ambiente.
 - `composer.json`: dependências PHP.
 
@@ -27,7 +28,7 @@ Aplicação web desenvolvida como projeto de estudo, com cadastro de usuários, 
 
 Instale PHP 8.1 ou superior com a extensão PDO PostgreSQL habilitada, Composer e PostgreSQL.
 
-### 2. Dependências
+### 2. Instalar as dependências
 
 Na raiz do repositório, execute:
 
@@ -35,7 +36,7 @@ Na raiz do repositório, execute:
 composer install
 ```
 
-### 3. Variáveis de ambiente
+### 3. Configurar as variáveis de ambiente
 
 Copie `.env.example` para um arquivo chamado `.env` e preencha os dados do seu ambiente:
 
@@ -50,16 +51,24 @@ GMAIL_USER=
 GMAIL_APP_PASSWORD=
 ```
 
-Use uma senha de app do Gmail para o envio de e-mails, não a senha normal da conta. Não envie o arquivo `.env` para o GitHub.
+Para enviar os códigos de verificação, use uma senha de app do Gmail, não a senha normal da conta. Não envie o arquivo `.env` para o GitHub.
 
-### 4. Banco de dados
+### 4. Preparar o banco
 
-Crie o banco no PostgreSQL e aplique os arquivos de migração disponíveis em `backend/migrations/`, seguindo a ordem indicada pelos nomes dos arquivos. Confira também os scripts em `backend/scripts/` antes de executar operações de cadastro ou manutenção.
+Crie o banco PostgreSQL e configure as tabelas necessárias antes de executar a aplicação. O repositório não inclui uma migração inicial completa do banco. O arquivo `backend/migrations/001_senha_varchar_255.sql` altera a coluna `senha` da tabela `usuario` para aceitar hashes maiores; ele deve ser executado uma única vez em um banco que já possua essa tabela.
 
-### 5. Executar
+### 5. Iniciar o servidor local
 
-O projeto não define um comando único de inicialização no `composer.json`. Para testar localmente, configure o servidor PHP para servir a pasta pública correta do projeto e mantenha a conexão com o PostgreSQL disponível. Consulte a estrutura de pastas e os pontos de entrada existentes antes de configurar o servidor.
+Na raiz do projeto, execute:
+
+```bash
+php -S 127.0.0.1:8000 -t .
+```
+
+Depois, acesse [http://127.0.0.1:8000/cadastrar.html](http://127.0.0.1:8000/cadastrar.html) ou [http://127.0.0.1:8000/login.html](http://127.0.0.1:8000/login.html).
+
+Mantenha o PostgreSQL ativo e confira as configurações do `.env` caso a conexão com o banco ou o envio de e-mails não funcione.
 
 ## Observações
 
-Este repositório está em desenvolvimento. Os passos de execução podem variar conforme a configuração local do servidor e do banco de dados.
+Este projeto está em desenvolvimento. A configuração local pode exigir ajustes conforme o ambiente e a estrutura do banco utilizada.
